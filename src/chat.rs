@@ -85,7 +85,7 @@ pub struct ChatCompletionChoice {
 pub enum ChatError {
     InvalidUrl(String),
     NetworkError(reqwest::Error),
-    ResponseError(reqwest::StatusCode, ChatCompletionResponse),
+    ResponseError(reqwest::StatusCode, reqwest::Response),
     NoMessageReturned,
 }
 
@@ -97,7 +97,11 @@ impl std::fmt::Display for ChatError {
             ChatError::InvalidUrl(e) => write!(f, "URL parse error: {}", e),
             ChatError::NetworkError(e) => write!(f, "Request error: {}", e),
             ChatError::ResponseError(status, response) => {
-                write!(f, "Response error: {} - {:?}", status, response)
+                write!(
+                    f,
+                    "Unexpected response: status: {} - {:?}",
+                    status, response
+                )
             }
             ChatError::NoMessageReturned => write!(f, "No message returned"),
         }
