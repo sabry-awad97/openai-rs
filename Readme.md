@@ -24,12 +24,14 @@ let client = OpenAIClient::new("https://api.openai.com", "sk-***********");
 Then, send a request to the API with a `ChatCompletionRequest`:
 
 ```rs
-use openai_rs::{ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel};
+use openai_rs::{
+    ChatCompletionMessage, ChatCompletionRequest, ChatCompletionMessageRole, ChatCompletionModel
+};
 
 let request = ChatCompletionRequest::builder(
-        OAIModel::GPT3Turbo,
+        ChatCompletionModel::GPT3Turbo,
         vec![ChatCompletionMessage {
-            role: MessageRole::User,
+            role: ChatCompletionMessageRole::User,
             content: "Hello, how are you?".to_string(),
         }],
     )
@@ -50,7 +52,9 @@ Here's a complete example that sends a chat message and prints the response:
 use dotenv::dotenv;
 use envconfig::Envconfig;
 
-use openai_rs::{ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel, OpenAIClient};
+use openai_rs::{
+    ChatCompletionMessage, ChatCompletionRequest, ChatCompletionMessageRole, ChatCompletionModel, OpenAIClient
+};
 
 #[derive(Envconfig)]
 pub struct Config {
@@ -68,9 +72,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = OpenAIClient::new(&config.api_host, &config.openai_api_key);
 
     let request = ChatCompletionRequest::builder(
-        OAIModel::GPT3Turbo,
+        ChatCompletionModel::GPT3Turbo,
         vec![ChatCompletionMessage {
-            role: MessageRole::User,
+            role: ChatCompletionMessageRole::User,
             content: "Hello, how are you?".to_string(),
         }],
     )
