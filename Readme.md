@@ -18,7 +18,7 @@ First, create a new `OpenAIClient` instance with your API host and key:
 ```rs
 use openai_rs::OpenAIClient;
 
-let client = OpenAIClient::new("https://api.openai.com", "sk-***********");
+let client = OpenAIClient::new("https://api.openai.com", "sk-***********")?;
 ```
 
 Then, send a request to the API with a `ChatCompletionRequest`:
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     env_logger::init();
     let config = Config::init_from_env()?;
-    let client = OpenAIClient::new(&config.api_host, &config.openai_api_key);
+    let client = OpenAIClient::new(&config.api_host, &config.openai_api_key)?;
 
     let request = ChatCompletionRequest::builder(
         ChatCompletionModel::GPT3Turbo,
