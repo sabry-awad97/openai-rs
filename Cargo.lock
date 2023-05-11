@@ -534,7 +534,6 @@ dependencies = [
  "log",
  "reqwest",
  "serde",
- "serde_json",
 ]
 
 [[package]]
