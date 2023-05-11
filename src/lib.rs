@@ -3,7 +3,7 @@ use chat::{
     ChatCompletionMessage, ChatCompletionRequest, ChatCompletionResponse, MessageRole, OAIModel,
 };
 use log::{error, info};
-use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::header::{HeaderValue, CONTENT_TYPE};
 
 pub async fn run(api_host: &str, api_key: &str) -> Result<String, Box<dyn std::error::Error>> {
     let request = ChatCompletionRequest {
@@ -22,16 +22,10 @@ pub async fn run(api_host: &str, api_key: &str) -> Result<String, Box<dyn std::e
     let client = reqwest::Client::new();
     let url = api_host.to_string() + "/v1/chat/completions";
 
-    let mut headers = HeaderMap::new();
-    headers.insert(
-        AUTHORIZATION,
-        format!("Bearer {}", api_key).parse().unwrap(),
-    );
-    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-
     let response = client
         .post(url)
-        .headers(headers)
+        .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
+        .bearer_auth(api_key)
         .json(&request)
         .send()
         .await?;
