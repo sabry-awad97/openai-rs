@@ -1,6 +1,6 @@
 use dotenv::dotenv;
 use envconfig::Envconfig;
-use log::{info, error};
+use log::{error, info};
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize)]
@@ -36,7 +36,7 @@ pub enum OAIModel {
     GPT4,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ChatCompletionResponse {
     pub id: String,
     pub object: String,
@@ -53,7 +53,7 @@ pub struct Usage {
     pub total_tokens: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ChatCompletionChoice {
     pub index: u64,
     pub message: ChatCompletionMessage,
@@ -72,7 +72,7 @@ pub struct Config {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     env_logger::init();
-    
+
     let config = Config::init_from_env()?;
 
     let request = ChatCompletionRequest {
@@ -107,12 +107,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     let status = response.status();
-    let body = response.text().await?;
+    let body = response.json::<ChatCompletionResponse>().await?;
 
     if status.is_success() {
-        info!("Response: {}", body);
+        info!("Response: {:?}", body);
     } else {
-        error!("Error: {} - {}", status, body);
+        error!("Error: {} - {:?}", status, body);
     }
 
     Ok(())
