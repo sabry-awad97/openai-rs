@@ -5,23 +5,23 @@ use serde::{Deserialize, Serialize};
 #[builder(pattern = "owned")]
 #[builder(setter(strip_option, into))]
 pub struct ChatCompletionRequest {
-    pub model: OAIModel,
-    pub messages: Vec<ChatCompletionMessage>,
+    model: OAIModel,
+    messages: Vec<ChatCompletionMessage>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub temperature: Option<f32>,
+    temperature: Option<f32>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub top_p: Option<f32>,
+    top_p: Option<f32>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub max_tokens: Option<u64>,
+    max_tokens: Option<u64>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub frequency_penalty: Option<f32>,
+    frequency_penalty: Option<f32>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub presence_penalty: Option<f32>,
+    presence_penalty: Option<f32>,
 }
 
 impl ChatCompletionRequest {
