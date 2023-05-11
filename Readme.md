@@ -16,7 +16,7 @@ openai_rs = { git = "https://github.com/sabry-awad97/openai-rs" }
 First, create a new `OpenAIClient` instance with your API host and key:
 
 ```rs
-use mod_chat::OpenAIClient;
+use openai_rs::OpenAIClient;
 
 let client = OpenAIClient::new("https://api.openai.com", "sk-***********");
 ```

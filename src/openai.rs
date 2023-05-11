@@ -1,5 +1,6 @@
 use crate::chat::{self, ChatCompletionRequest, ChatError};
 use chat::ChatCompletionResponse;
+use log::debug;
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 use std::fmt::Debug;
 
@@ -21,6 +22,9 @@ impl OpenAIClient {
     pub async fn send_request(&self, request: ChatCompletionRequest) -> Result<String, ChatError> {
         let url = format!("{}/v1/chat/completions", self.api_host);
 
+        debug!("Sending request to URL: {}", url);
+        debug!("Request body: {:?}", request);
+
         let response = self
             .client
             .post(url)
@@ -32,6 +36,8 @@ impl OpenAIClient {
 
         let status = response.status();
         let response = response.json::<ChatCompletionResponse>().await?;
+
+        debug!("Response status: {}", status);
 
         if status.is_success() {
             log::info!("Response: {:?}", response);
@@ -46,6 +52,7 @@ impl OpenAIClient {
             .map(|choice| choice.message.content.clone())
             .ok_or_else(|| ChatError::NoMessageReturned)?;
 
+        debug!("Result: {}", result);
         Ok(result)
     }
 }
