@@ -1,9 +1,9 @@
 use crate::chat::{self, ChatCompletionRequest, ChatError};
 use chat::ChatCompletionResponse;
-use log::debug;
+use log::{debug, info, error};
 use reqwest::{
     header::{HeaderValue, CONTENT_TYPE},
-    ClientBuilder, Url,
+    ClientBuilder, StatusCode, Url,
 };
 use std::fmt::Debug;
 
@@ -50,25 +50,26 @@ impl OpenAIClient {
             match response {
                 Ok(response) => {
                     let status = response.status();
-                    let response = response.json::<ChatCompletionResponse>().await?;
-
                     debug!("Response status: {}", status);
 
-                    if status.is_success() {
-                        log::info!("Response: {:?}", response);
+                    match status {
+                        StatusCode::OK => {
+                            let response = response.json::<ChatCompletionResponse>().await?;
+                            info!("Request successful {:#?}", response);
+                            let result = response
+                                .choices
+                                .first()
+                                .map(|choice| choice.message.content.clone())
+                                .ok_or_else(|| ChatError::NoMessageReturned)?;
+                            debug!("Result: {}", result);
+                            return Ok(result);
+                        }
 
-                        let result = response
-                            .choices
-                            .first()
-                            .map(|choice| choice.message.content.clone())
-                            .ok_or_else(|| ChatError::NoMessageReturned)?;
-
-                        debug!("Result: {}", result);
-                        return Ok(result);
-                    } else {
-                        log::error!("Error: {} - {:?}", status, response);
-                        return Err(ChatError::ResponseError(status, response));
-                    }
+                        status_code => {
+                            error!("Response status: {}", status_code);
+                            return Err(ChatError::ResponseError(status_code, response));
+                        }
+                    };
                 }
                 Err(err) => {
                     retries += 1;
