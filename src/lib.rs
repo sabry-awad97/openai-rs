@@ -3,22 +3,22 @@ use crate::chat::ChatError;
 use chat::ChatCompletionResponse;
 pub use chat::{ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel};
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
-pub struct ChatClient {
+pub struct OpenAIClient {
     api_host: String,
     api_key: String,
     client: reqwest::Client,
 }
 
-impl ChatClient {
+impl OpenAIClient {
     pub fn new(api_host: &str, api_key: &str) -> Self {
-        ChatClient {
+        OpenAIClient {
             api_host: api_host.to_string(),
             api_key: api_key.to_string(),
             client: reqwest::Client::new(),
         }
     }
 
-    pub async fn run(&self, request: ChatCompletionRequest) -> Result<String, ChatError> {
+    pub async fn send_request(&self, request: ChatCompletionRequest) -> Result<String, ChatError> {
         let url = format!("{}/v1/chat/completions", self.api_host);
 
         let response = self

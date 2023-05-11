@@ -2,7 +2,7 @@ use dotenv::dotenv;
 use envconfig::Envconfig;
 
 use openai_rs::{
-    self, ChatClient, ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel,
+    self, ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel, OpenAIClient,
 };
 
 #[derive(Envconfig)]
@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
     env_logger::init();
     let config = Config::init_from_env()?;
-    let client = ChatClient::new(&config.api_host, &config.openai_api_key);
+    let client = OpenAIClient::new(&config.api_host, &config.openai_api_key);
 
     let request = ChatCompletionRequest {
         model: OAIModel::GPT3Turbo,
@@ -33,7 +33,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         presence_penalty: Some(0.0),
     };
 
-    let response = client.run(request).await?;
+    let response = client.send_request(request).await?;
     println!("{}", response);
 
     Ok(())
