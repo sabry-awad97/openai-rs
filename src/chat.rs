@@ -56,3 +56,38 @@ pub struct ChatCompletionChoice {
     pub message: ChatCompletionMessage,
     pub finish_reason: Option<String>,
 }
+
+#[derive(Debug)]
+pub enum ChatError {
+    RequestError(reqwest::Error),
+    ResponseError(reqwest::StatusCode, ChatCompletionResponse),
+    SerdeError(serde_json::Error),
+    NoMessageReturned,
+}
+
+impl std::error::Error for ChatError {}
+
+impl std::fmt::Display for ChatError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ChatError::RequestError(e) => write!(f, "Request error: {}", e),
+            ChatError::ResponseError(status, response) => {
+                write!(f, "Response error: {} - {:?}", status, response)
+            }
+            ChatError::SerdeError(e) => write!(f, "Serde error: {}", e),
+            ChatError::NoMessageReturned => write!(f, "No message returned"),
+        }
+    }
+}
+
+impl From<reqwest::Error> for ChatError {
+    fn from(error: reqwest::Error) -> Self {
+        ChatError::RequestError(error)
+    }
+}
+
+impl From<serde_json::Error> for ChatError {
+    fn from(error: serde_json::Error) -> Self {
+        ChatError::SerdeError(error)
+    }
+}

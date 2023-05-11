@@ -5,40 +5,7 @@ use chat::{
 use log::{error, info};
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
 
-#[derive(Debug)]
-enum ChatError {
-    RequestError(reqwest::Error),
-    ResponseError(reqwest::StatusCode, ChatCompletionResponse),
-    SerdeError(serde_json::Error),
-    NoMessageReturned,
-}
-
-impl std::error::Error for ChatError {}
-
-impl std::fmt::Display for ChatError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ChatError::RequestError(e) => write!(f, "Request error: {}", e),
-            ChatError::ResponseError(status, response) => {
-                write!(f, "Response error: {} - {:?}", status, response)
-            }
-            ChatError::SerdeError(e) => write!(f, "Serde error: {}", e),
-            ChatError::NoMessageReturned => write!(f, "No message returned"),
-        }
-    }
-}
-
-impl From<reqwest::Error> for ChatError {
-    fn from(error: reqwest::Error) -> Self {
-        ChatError::RequestError(error)
-    }
-}
-
-impl From<serde_json::Error> for ChatError {
-    fn from(error: serde_json::Error) -> Self {
-        ChatError::SerdeError(error)
-    }
-}
+use crate::chat::ChatError;
 
 pub async fn run(api_host: &str, api_key: &str) -> Result<String, Box<dyn std::error::Error>> {
     let request = ChatCompletionRequest {
