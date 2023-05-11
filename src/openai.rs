@@ -8,6 +8,7 @@ pub struct OpenAIClient {
     api_host: String,
     api_key: String,
     client: reqwest::Client,
+    max_retries: u8,
 }
 
 impl OpenAIClient {
@@ -16,6 +17,7 @@ impl OpenAIClient {
             api_host: api_host.to_string(),
             api_key: api_key.to_string(),
             client: reqwest::Client::new(),
+            max_retries: 3,
         }
     }
 
@@ -61,11 +63,11 @@ impl OpenAIClient {
                 }
                 Err(err) => {
                     retries += 1;
-                    if retries > 3 {
+                    if retries > self.max_retries {
                         return Err(ChatError::NetworkError(err));
                     }
                     debug!("Error: {}", err);
-                    debug!("Retrying request (attempt {})", retries);
+                    debug!("Retrying request (attempt {}/{})", retries, self.max_retries);
                 }
             }
         }
