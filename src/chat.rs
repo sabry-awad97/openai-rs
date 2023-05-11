@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[builder(pattern = "owned")]
 #[builder(setter(strip_option, into))]
 pub struct ChatCompletionRequest {
-    model: OAIModel,
+    model: ChatCompletionModel,
     messages: Vec<ChatCompletionMessage>,
     #[builder(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -26,7 +26,7 @@ pub struct ChatCompletionRequest {
 
 impl ChatCompletionRequest {
     pub fn builder(
-        model: impl Into<OAIModel>,
+        model: impl Into<ChatCompletionModel>,
         messages: impl Into<Vec<ChatCompletionMessage>>,
     ) -> ChatCompletionRequestBuilder {
         ChatCompletionRequestBuilder::create_empty()
@@ -37,20 +37,20 @@ impl ChatCompletionRequest {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct ChatCompletionMessage {
-    pub role: MessageRole,
+    pub role: ChatCompletionMessageRole,
     pub content: String,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "lowercase")]
-pub enum MessageRole {
+pub enum ChatCompletionMessageRole {
     System,
     User,
     Assistant,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum OAIModel {
+pub enum ChatCompletionModel {
     #[serde(rename = "gpt-3.5-turbo")]
     GPT3Turbo,
     #[serde(rename = "gpt-4")]
@@ -64,11 +64,11 @@ pub struct ChatCompletionResponse {
     pub created: u64,
     pub model: String,
     pub choices: Vec<ChatCompletionChoice>,
-    pub usage: Option<Usage>,
+    pub usage: Option<ChatCompletionUsage>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Usage {
+pub struct ChatCompletionUsage {
     pub prompt_tokens: i64,
     pub completion_tokens: i64,
     pub total_tokens: i64,
