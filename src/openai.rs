@@ -1,6 +1,6 @@
 use crate::chat::{self, ChatCompletionRequest, ChatError};
 use chat::ChatCompletionResponse;
-use log::{debug, info, error};
+use log::{debug, error, info};
 use reqwest::{
     header::{HeaderValue, CONTENT_TYPE},
     ClientBuilder, StatusCode, Url,
@@ -54,9 +54,15 @@ impl OpenAIClient {
 
                     match status {
                         StatusCode::OK => {
-                            let response = response.json::<ChatCompletionResponse>().await?;
-                            info!("Request successful {:#?}", response);
-                            let result = response
+                            let response_text = response.text().await?;
+                            let response_json =
+                                serde_json::from_str::<ChatCompletionResponse>(&response_text)
+                                    .map_err(|err| {
+                                        ChatError::InvalidResponseFormat(err.to_string())
+                                    })?;
+
+                            info!("Request successful {:#?}", response_json);
+                            let result = response_json
                                 .choices
                                 .first()
                                 .map(|choice| choice.message.content.clone())

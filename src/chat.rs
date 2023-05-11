@@ -87,6 +87,7 @@ pub enum ChatError {
     NetworkError(reqwest::Error),
     ResponseError(reqwest::StatusCode, reqwest::Response),
     NoMessageReturned,
+    InvalidResponseFormat(String),
 }
 
 impl std::error::Error for ChatError {}
@@ -104,6 +105,9 @@ impl std::fmt::Display for ChatError {
                 )
             }
             ChatError::NoMessageReturned => write!(f, "No message returned"),
+            ChatError::InvalidResponseFormat(msg) => {
+                write!(f, "Invalid response format: {}", msg)
+            }
         }
     }
 }
