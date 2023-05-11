@@ -1,5 +1,6 @@
 use dotenv::dotenv;
 use envconfig::Envconfig;
+use log::{info, error};
 use reqwest::header::{HeaderMap, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 #[derive(Serialize)]
@@ -70,6 +71,8 @@ pub struct Config {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv().ok();
+    env_logger::init();
+    
     let config = Config::init_from_env()?;
 
     let request = ChatCompletionRequest {
@@ -101,11 +104,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .headers(headers)
         .json(&request)
         .send()
-        .await?
-        .json::<serde_json::Value>()
         .await?;
 
-    println!("{}", response);
+    let status = response.status();
+    let body = response.text().await?;
+
+    if status.is_success() {
+        info!("Response: {}", body);
+    } else {
+        error!("Error: {} - {}", status, body);
+    }
 
     Ok(())
 }
