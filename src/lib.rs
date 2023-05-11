@@ -3,6 +3,7 @@ use crate::chat::ChatError;
 use chat::ChatCompletionResponse;
 pub use chat::{ChatCompletionMessage, ChatCompletionRequest, MessageRole, OAIModel};
 use reqwest::header::{HeaderValue, CONTENT_TYPE};
+use std::fmt::Debug;
 pub struct OpenAIClient {
     api_host: String,
     api_key: String,
@@ -47,5 +48,17 @@ impl OpenAIClient {
             .ok_or_else(|| ChatError::NoMessageReturned)?;
 
         Ok(result)
+    }
+}
+
+impl Debug for OpenAIClient {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("OpenAIClient")
+            .field("api_host", &self.api_host)
+            .field(
+                "api_key",
+                &"sk-**************************************************",
+            )
+            .finish()
     }
 }
